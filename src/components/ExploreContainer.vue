@@ -2,7 +2,8 @@
   <div id="container">
     <strong>{{ name }}</strong>
     <p>
-      Explore<a
+      Explore
+      <a
         target="_blank"
         rel="noopener noreferrer"
         href="https://ionicframework.com/docs/components"

@@ -1,39 +1,55 @@
 <template>
   <ion-page>
     <ion-tabs>
-      <ion-tab-bar slot="bottom">
-        <ion-tab-button tab="tab1" href="/tabs/tab1">
-          <ion-icon :icon="triangle" />
-          <ion-label>Tab 1</ion-label>
+      <ion-tab-bar>
+        <ion-tab-button tab="home" href="/home">
+          <ion-icon src="/assets/icon/home.svg"></ion-icon>
+          <ion-label>Accueil</ion-label>
         </ion-tab-button>
-          
-        <ion-tab-button tab="tab2" href="/tabs/tab2">
-          <ion-icon :icon="ellipse" />
-          <ion-label>Tab 2</ion-label>
+
+        <ion-tab-button tab="contact" href="/contact">
+          <ion-icon src="/assets/icon/contact.svg" />
+          <ion-label>Contact</ion-label>
         </ion-tab-button>
-        
-        <ion-tab-button tab="tab3" href="/tabs/tab3">
-          <ion-icon :icon="square" />
-          <ion-label>Tab 3</ion-label>
+        <ion-tab-button tab="dashboard" href="">
+          <ion-icon src="/assets/icon/banque.svg" />
+          <ion-label>Banque</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button tab="news" href="/news">
+          <ion-icon src="/assets/icon/news.svg" />
+          <ion-label>News</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button tab="authentication" href="/authentication">
+          <ion-icon src="/assets/icon/account.svg" />
+          <ion-label>Compte</ion-label>
         </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
   </ion-page>
 </template>
 
-<script lang="ts">
-import { IonTabBar, IonTabButton, IonTabs, IonLabel, IonIcon, IonPage } from '@ionic/vue';
-import { ellipse, square, triangle } from 'ionicons/icons';
+<script>
+import {
+  IonTabBar,
+  IonTabButton,
+  IonTabs,
+  IonLabel,
+  IonIcon,
+  IonPage,
+} from "@ionic/vue";
+import { ellipse, square, triangle } from "ionicons/icons";
 
 export default {
-  name: 'Tabs',
+  name: "Tabs",
   components: { IonLabel, IonTabs, IonTabBar, IonTabButton, IonIcon, IonPage },
   setup() {
     return {
-      ellipse, 
-      square, 
+      ellipse,
+      square,
       triangle,
-    }
-  }
-}
+    };
+  },
+};
 </script>
