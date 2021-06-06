@@ -11,7 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: npm install -g @ionic/cli && ionic build
+      - name: Install Ionic
+      - run: npm install @ionic/cli
+      - name: Intall dependencies
+      - run: npm install
+      - name: Run build
+      - run: ionic build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
