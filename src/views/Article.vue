@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     backtoNews() {
-      this.$router.push({ path: "/news" });
+      this.$router.push({ path: "/articles" });
     },
   },
 };

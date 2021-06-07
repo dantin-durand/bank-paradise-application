@@ -1,7 +1,19 @@
 <template>
   <ion-page>
+    <ion-header translucent>
+      <ion-toolbar>
+        <ion-segment :value="currentform" @ionChange="segmentChanged">
+          <ion-segment-button value="login">
+            <ion-label>Connexion</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="register">
+            <ion-label>Inscription</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </ion-toolbar>
+    </ion-header>
     <ion-content :fullscreen="true">
-      <ion-card class="ion-padding">
+      <ion-card class="ion-padding" v-if="currentform === 'login'">
         <h2>Connexion</h2>
         <ion-item class="ion-no-padding">
           <ion-label position="floating">Adresse mail*</ion-label>
@@ -14,8 +26,8 @@
         <br />
         <ion-button @click="login" class="ion-margin-top">Connexion</ion-button>
       </ion-card>
-      <p class="loginOrInscription">OU</p>
-      <ion-card class="ion-padding">
+
+      <ion-card class="ion-padding" v-if="currentform === 'register'">
         <h2>Inscription</h2>
         <ion-item class="ion-no-padding">
           <ion-label position="floating">Pseudo</ion-label>
@@ -59,6 +71,10 @@ import {
   IonInput,
   IonItem,
   IonButton,
+  IonSegmentButton,
+  IonSegment,
+  IonToolbar,
+  IonHeader,
 } from "@ionic/vue";
 import { defineComponent } from "vue";
 
@@ -72,8 +88,20 @@ export default defineComponent({
     IonInput,
     IonItem,
     IonButton,
+    IonSegmentButton,
+    IonSegment,
+    IonToolbar,
+    IonHeader,
+  },
+  data() {
+    return {
+      currentform: "login",
+    };
   },
   methods: {
+    segmentChanged(event) {
+      this.currentform = event.detail.value;
+    },
     login() {
       this.$router.push({ path: "/account" });
     },
@@ -85,6 +113,17 @@ export default defineComponent({
 </script>
 
 <style scoped>
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+ion-card {
+  animation: fadeIn 0.5s forwards ease;
+}
 .newslist {
   display: grid;
   grid-template-columns: 1fr 1fr;

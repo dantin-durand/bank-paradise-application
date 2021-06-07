@@ -11,17 +11,18 @@
           <ion-icon src="/assets/icon/contact.svg" />
           <ion-label>Contact</ion-label>
         </ion-tab-button>
-        <ion-tab-button tab="dashboard" href="">
+
+        <ion-tab-button tab="dashboard" @click="openinNewTab">
           <ion-icon src="/assets/icon/banque.svg" />
           <ion-label>Banque</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="news" href="/news">
+        <ion-tab-button tab="articles" href="/articles">
           <ion-icon src="/assets/icon/news.svg" />
           <ion-label>News</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="authentication" href="/authentication">
+        <ion-tab-button tab="account" href="/account">
           <ion-icon src="/assets/icon/account.svg" />
           <ion-label>Compte</ion-label>
         </ion-tab-button>
@@ -51,5 +52,17 @@ export default {
       triangle,
     };
   },
+  methods: {
+    openinNewTab() {
+      window.location = "http://bank-paradise-site.herokuapp.com/dashboard";
+    },
+  },
 };
 </script>
+
+<style scoped>
+ion-tab-button {
+  --background-focused: var(--main-color);
+  --color-selected: var(--main-color);
+}
+</style>

@@ -18,7 +18,7 @@ export default {
   components: { IonCard },
   methods: {
     openNews() {
-      this.$router.push({ path: "/news/1" });
+      this.$router.push({ path: "/articles/1" });
     },
   },
 };
