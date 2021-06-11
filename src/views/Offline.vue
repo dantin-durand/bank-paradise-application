@@ -4,7 +4,7 @@
       <header>
         <img src="/assets/logo.svg" alt="offline" />
       </header>
-      <div>
+      <div class="informations">
         <img src="/assets/icon/offline.svg" alt="offline" />
         <p>Vous êtes hors ligne.</p>
 
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { IonPage, IonContent, IonButton } from "@ionic/vue";
+import { IonPage, IonContent, IonButton, loadingController } from "@ionic/vue";
 
 export default {
   name: "Offline",
@@ -27,7 +27,13 @@ export default {
     IonButton,
   },
   methods: {
-    reload() {
+    async reload() {
+      const loading = await loadingController.create({
+        message: "Chargement...",
+      });
+
+      await loading.present();
+
       window.location.href = "/";
     },
   },
@@ -38,7 +44,7 @@ export default {
 header > img {
   width: 105px;
 }
-div > img {
+.informations > img {
   width: 56px;
 }
 header {
@@ -49,7 +55,7 @@ header {
   text-align: center;
   padding: 20px;
 }
-div {
+.informations {
   height: 100vh;
   widows: 100%;
   display: flex;
