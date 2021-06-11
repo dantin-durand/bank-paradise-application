@@ -6,6 +6,8 @@ import router from "./router";
 if (process.env.NODE_ENV === "production") {
   register(`${process.env.BASE_URL}service-worker.js`, {
     ready() {
+      console.log("navigator", navigator.onLine);
+      if (!navigator.onLine) return router.push({ path: "/offline" });
       console.log(
         "App is being served from cache by a service worker.\n" +
           "For more details, visit https://goo.gl/AFskqB"
