@@ -15,6 +15,10 @@ const routes = [
         redirect: "/",
       },
       {
+        path: "offline",
+        component: () => import("@/views/Offline.vue"),
+      },
+      {
         path: "home",
         component: () => import("@/views/Home.vue"),
       },
