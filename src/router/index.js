@@ -37,6 +37,7 @@ const routes = [
       },
       {
         path: "auth",
+        name: "authentication",
         component: () => import("@/views/Authentication/Authentication.vue"),
       },
       {
@@ -56,6 +57,7 @@ const routes = [
       },
       {
         path: "account",
+        name: "account",
         component: () => import("@/views/Account.vue"),
       },
     ],

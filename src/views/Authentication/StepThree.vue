@@ -11,9 +11,19 @@
       </div>
       <ion-card class="ion-padding">
         <p>PRIX TTC</p>
-        <h1>3.99€ <span>/mois</span></h1>
+        <h1 v-if="plan.id">{{ plan.price }}€ <span>/mois</span></h1>
+        <h1 v-else>
+          <ion-skeleton-text animated style="height: 40px"></ion-skeleton-text>
+        </h1>
 
-        <div class="stripe">stripe ici</div>
+        <StripeCheckout
+          v-if="!requires_action && !payment_processed"
+          :card="card"
+          :stripe="stripe"
+          :secret="secret"
+          :token="token"
+        />
+
         <div class="t-center">
           <ion-button @click="payement" class="ion-margin-top"
             >Payer</ion-button
@@ -25,8 +35,16 @@
 </template>
 
 <script>
-import { IonPage, IonContent, IonCard, IonButton } from "@ionic/vue";
+import {
+  IonPage,
+  IonContent,
+  IonCard,
+  IonButton,
+  IonSkeletonText,
+} from "@ionic/vue";
 import { defineComponent } from "vue";
+import axios from "axios";
+import StripeCheckout from "../../components/StripeCheckout.vue";
 
 export default defineComponent({
   name: "StepThree",
@@ -35,6 +53,60 @@ export default defineComponent({
     IonPage,
     IonCard,
     IonButton,
+    IonSkeletonText,
+    StripeCheckout,
+  },
+  data() {
+    return {
+      plan: {},
+      secret: null,
+      stripe: null,
+      payment_method: null,
+      requires_action: null,
+      payment_intent: null,
+      card: null,
+      payment_processed: false,
+      token: null,
+    };
+  },
+  created() {
+    if (!this.$store.getters["auth/token"]) {
+      return this.$router.push({ name: "authentication" });
+    }
+
+    this.$store.dispatch("payment/plans").then(() => {
+      const plans = this.$store.getters["payment/plans"];
+      let plansFilter = [];
+      plansFilter = plans.filter(
+        (plan) => plan.id == this.$route.query.formule
+      );
+      if (plansFilter.length === 0) {
+        this.$router.push({ name: "RegisterStep2" });
+      } else {
+        this.plan = plansFilter[0];
+        console.log(this.plan.id);
+      }
+    });
+  },
+  mounted() {
+    this.stripe = window.Stripe(process.env.VUE_APP_STRIPE_PUBLIC_KEY);
+    const elements = this.stripe.elements();
+    this.card = elements.create("card");
+    this.card.mount("#card-element");
+    this.token = this.$store.getters["auth/token"];
+    axios
+      .post(`${process.env.VUE_APP_API_URL}/checkout/intent`, null, {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters["auth/token"]}`,
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        this.secret = response.data.client_secret;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   },
   methods: {
     payement() {

@@ -13,45 +13,42 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
+      <!-- LOGIN -->
       <ion-card class="ion-padding" v-if="currentform === 'login'">
         <h2>Connexion</h2>
         <ion-item class="ion-no-padding">
           <ion-label position="floating">Adresse mail*</ion-label>
-          <ion-input></ion-input>
+          <ion-input v-model="form.email"></ion-input>
         </ion-item>
         <ion-item class="ion-no-padding">
           <ion-label position="floating">Mot de passe*</ion-label>
-          <ion-input type="password"></ion-input>
+          <ion-input type="password" v-model="form.password"></ion-input>
         </ion-item>
         <br />
         <ion-button @click="login" class="ion-margin-top">Connexion</ion-button>
       </ion-card>
-
+      <!-- REGISTER -->
       <ion-card class="ion-padding" v-if="currentform === 'register'">
         <h2>Inscription</h2>
         <ion-item class="ion-no-padding">
-          <ion-label position="floating">Pseudo</ion-label>
-          <ion-input></ion-input>
-        </ion-item>
-        <ion-item class="ion-no-padding">
           <ion-label position="floating">Adresse mail</ion-label>
-          <ion-input></ion-input>
+          <ion-input v-model="form.email"></ion-input>
         </ion-item>
         <ion-item class="ion-no-padding">
           <ion-label position="floating">Prénom RP</ion-label>
-          <ion-input></ion-input>
+          <ion-input v-model="form.firstname"></ion-input>
         </ion-item>
         <ion-item class="ion-no-padding">
           <ion-label position="floating">Nom RP</ion-label>
-          <ion-input></ion-input>
+          <ion-input v-model="form.lastname"></ion-input>
         </ion-item>
         <ion-item class="ion-no-padding">
           <ion-label position="floating">Mot de passe</ion-label>
-          <ion-input type="password"></ion-input>
+          <ion-input type="password" v-model="form.password"></ion-input>
         </ion-item>
         <ion-item class="ion-no-padding">
           <ion-label position="floating">Confirmez le mot de passe</ion-label>
-          <ion-input type="password"></ion-input>
+          <ion-input type="password" v-model="form.password2"></ion-input>
         </ion-item>
         <br />
         <ion-button @click="register" class="ion-margin-top"
@@ -95,18 +92,50 @@ export default defineComponent({
   },
   data() {
     return {
+      form: {
+        email: "",
+        firstname: "",
+        lastname: "",
+        password: "",
+        password2: "",
+      },
       currentform: "login",
     };
+  },
+  created() {
+    if (!this.$store.getters["auth/token"]) {
+      console.log("echec d'authentification");
+    } else {
+      console.log("authentification avec succès");
+      this.$router.push({ path: "/account" });
+    }
   },
   methods: {
     segmentChanged(event) {
       this.currentform = event.detail.value;
     },
-    login() {
-      this.$router.push({ path: "/account" });
+    async login() {
+      await this.$store.dispatch("auth/login", this.form).then(() => {
+        if (!this.$store.getters["auth/token"]) {
+          console.log("echec d'authentification");
+        } else if (this.$store.getters["auth/step"] > 0) {
+          this.$router.push({
+            name: `RegisterStep${this.$store.getters["auth/step"]}`,
+          });
+        } else {
+          this.$router.push({ name: "account" });
+        }
+      });
     },
-    register() {
-      this.$router.push({ name: "RegisterStep2" });
+    async register() {
+      if (this.form.password !== this.form.password2) return;
+      await this.$store.dispatch("auth/register", this.form).then(() => {
+        if (!this.$store.getters["auth/token"]) {
+          console.log("echec d'authentification");
+        } else {
+          this.$router.push({ name: "account" });
+        }
+      });
     },
   },
 });

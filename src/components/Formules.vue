@@ -12,7 +12,7 @@
           <li>Historique des transactions</li>
         </ul>
         <div class="t-center">
-          <ion-button @click="changePage">Sélectionner</ion-button>
+          <ion-button @click="changePage(1)">Sélectionner</ion-button>
         </div>
       </ion-card-content>
     </ion-card>
@@ -30,7 +30,7 @@
           </li>
         </ul>
         <div class="t-center">
-          <ion-button @click="changePage">Sélectionner</ion-button>
+          <ion-button @click="changePage(2)">Sélectionner</ion-button>
         </div>
       </ion-card-content>
     </ion-card>
@@ -48,7 +48,7 @@
         </ul>
 
         <div class="t-center">
-          <ion-button @click="changePage">Sélectionner</ion-button>
+          <ion-button @click="changePage(3)">Sélectionner</ion-button>
         </div>
       </ion-card-content>
     </ion-card>
@@ -68,10 +68,16 @@ export default {
     },
   },
   methods: {
-      changePage() {
-          this.$router.push({path: this.path})
+    changePage(id_formule) {
+      if (this.path === "/register/3") {
+        return this.$router.push({
+          path: this.path,
+          query: { formule: id_formule },
+        });
       }
-  }
+      this.$router.push({ path: this.path });
+    },
+  },
 };
 </script>
 
