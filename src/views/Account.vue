@@ -18,9 +18,13 @@
         <p>Adresse mail: {{ user.email }}</p>
         <p>Nom RP: {{ user.lastname }}</p>
         <p>Prénom RP: {{ user.firstname }}</p>
-        <ion-button class="ion-margin-top">Modifier</ion-button>
+        <p>Mot de passe: {{ user.password }}</p>
+        <p>Confirmer nouveau mot de passe: {{ user.confirmPassword }}</p>
+        <ion-button @click="editUserinfo" class="ion-margin-top"
+          >Modifier</ion-button
+        >
       </ion-card>
-      <ion-card class="ion-padding">
+      <ion-card v-if="userHasSubscribed" class="ion-padding">
         <h3>Abonnemment</h3>
         <p>Formule actuelle: Communauté (3.99€)</p>
         <p>Prochain paiement: 02/11/2021</p>
@@ -30,6 +34,14 @@
         >
         <ion-button class="ion-margin-top secondary-btn" size="small"
           >Mettre en pause</ion-button
+        >
+      </ion-card>
+      <ion-card v-else class="ion-padding">
+        <ion-button
+          @click.prevent="goToSubscription"
+          class="ion-margin-top secondary-btn"
+          size="small"
+          >Souscrire à un abonnement</ion-button
         >
       </ion-card>
     </ion-content>
@@ -88,6 +100,8 @@
 </template>
 
 <script>
+import useVuelidate from "@vuelidate/core";
+import { required, email, minLength, sameAs } from "@vuelidate/validators";
 import {
   IonPage,
   IonContent,
@@ -107,8 +121,19 @@ export default defineComponent({
     IonButton,
     IonSkeletonText,
   },
+
+  data() {
+    return {
+      userHasSubscribed: false,
+    };
+  },
   computed: {
     ...mapGetters({ user: "auth/data" }),
+  },
+  mounted() {
+    if (this.user.stripe_id) {
+      this.userHasSubscribe = true;
+    }
   },
   created() {
     if (!this.$store.getters["auth/token"]) {
@@ -117,8 +142,34 @@ export default defineComponent({
       this.$store.dispatch("auth/account");
     }
   },
+  setup() {
+    return { v$: useVuelidate() };
+  },
+
+  validations() {
+    return {
+      form: {
+        email: { required, email },
+        firstname: { required },
+        lastname: { required },
+        password: { required, minLength: minLength(12) },
+        confirmPassword: { required, sameAsPassword: sameAs("password") },
+      },
+    };
+  },
   methods: {
     ...mapActions({ logout: "auth/logout" }),
+
+    goToSubscription() {
+      this.$router.push({ name: "RegisterStep2" });
+    },
+    async editUserInfo() {
+      await this.$store
+        .dispatch("auth/editUserInfo", this.form)
+        .then((result) => {
+          this.user = result.data.user;
+        });
+    },
   },
 });
 </script>

@@ -35,7 +35,73 @@ export const register = async ({ commit }, form) => {
     .post(process.env.VUE_APP_API_URL + "/auth/register", params)
     .then((response) => {
       commit("token", response.data.token);
+      commit("step", response.data.current_step);
       console.log(response.data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+export const customerCare = async ({ commit }, form) => {
+  console.log(commit);
+  console.log(form);
+  let params = {
+    object: form.object,
+    email: form.email,
+    lastname: form.lastname,
+    firstname: form.firstname,
+    body: form.body,
+  };
+
+  await axios
+    .post(process.env.VUE_APP_API_URL + "/customerCare", params)
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((error) => {
+      console.log(error.response);
+    });
+};
+
+export const community = async ({ commit, state }, form) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${state.user.token}`,
+    },
+  };
+
+  let params = {
+    name: form.name,
+    description: form.description,
+  };
+  await axios
+    .post(process.env.VUE_APP_API_URL + "/community", params, config)
+    .then((response) => {
+      commit("community", response.data.community);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+export const editUserInfo = async ({ commit, state }, form) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${state.user.token}`,
+    },
+  };
+
+  let params = {
+    firstname: form.firstname,
+    lastname: form.lastname,
+    email: form.email,
+    password: form.password,
+  };
+
+  await axios
+    .put(process.env.VUE_APP_API_URL + "/user", params, config)
+    .then((response) => {
+      commit("user", response.data.user);
     })
     .catch((error) => {
       console.log(error);
@@ -43,6 +109,7 @@ export const register = async ({ commit }, form) => {
 };
 
 export const account = async ({ commit, state }) => {
+  console.log("bisbkbvdkbvkdbvjdbvkdfbfbk");
   const config = {
     headers: {
       Authorization: `Bearer ${state.user.token}`,

@@ -97,9 +97,7 @@ export default {
               this.$emit("requiresAction", true);
               this.$emit("paymentIntent", response.data);
             } else {
-              this.resetForm();
-              this.$emit("paymentProcessed", true);
-              this.$emit("messageProcessed", "Merci de votre abonnement ! 🤑");
+              this.$router.push({ name: "RegisterStep4" });
             }
           })
           .catch((error) => {

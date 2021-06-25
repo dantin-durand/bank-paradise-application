@@ -32,6 +32,11 @@ import NewsItem from "@/components/NewsItem.vue";
 import { defineComponent } from "vue";
 export default defineComponent({
   name: "News",
+  data() {
+    return {
+      articles: [],
+    };
+  },
   components: {
     NewsItem,
     IonContent,
@@ -39,6 +44,13 @@ export default defineComponent({
     IonHeader,
     IonToolbar,
     IonTitle,
+  },
+  methods: {
+    async getArticles() {
+      await this.$store.dispatch("articles/getArticlesList").then((result) => {
+        this.articles = result;
+      });
+    },
   },
 });
 </script>

@@ -15,27 +15,35 @@
         <form action="">
           <ion-item>
             <ion-label position="floating">Nom*</ion-label>
-            <ion-input></ion-input>
+            <ion-input v-model="form.lastname"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Prénom*</ion-label>
-            <ion-input></ion-input>
+            <ion-input v-model="form.firstname"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Adresse Mail*</ion-label>
-            <ion-input></ion-input>
+            <ion-input v-model="form.email"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Objet</ion-label>
-            <ion-input></ion-input>
+            <ion-input v-model="form.object"></ion-input>
           </ion-item>
           <br />
           <ion-item>
             <ion-label position="floating">Message</ion-label>
-            <ion-textarea placeholder="Message" rows="6"></ion-textarea>
+            <ion-textarea
+              v-model="form.body"
+              placeholder="Message"
+              rows="6"
+            ></ion-textarea>
           </ion-item>
 
-          <ion-button class="ion-margin-top">Envoyer</ion-button>
+          <ion-button
+            @click.prevent="sendCustomerCareMail"
+            class="ion-margin-top"
+            >Envoyer</ion-button
+          >
         </form>
         <div class="contact">
           <ul>
@@ -66,6 +74,8 @@
 </template>
 
 <script>
+import useVuelidate from "@vuelidate/core";
+import { required, email } from "@vuelidate/validators";
 import {
   IonPage,
   IonContent,
@@ -101,7 +111,37 @@ export default {
       map,
       call,
       mail,
+      v$: useVuelidate(),
     };
+  },
+  data() {
+    return {
+      form: {
+        object: "",
+        firstname: "",
+        lastname: "",
+        email: "",
+        body: "",
+      },
+    };
+  },
+  validations() {
+    return {
+      form: {
+        object: { required },
+        firstname: { required },
+        lastname: { required },
+        email: { required, email },
+        body: { required },
+      },
+    };
+  },
+  methods: {
+    async sendCustomerCareMail() {
+      await this.$store
+        .dispatch("auth/customerCare", this.form)
+        .then((response) => console.log(response));
+    },
   },
 };
 </script>

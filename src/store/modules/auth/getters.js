@@ -13,3 +13,7 @@ export const data = (state) => {
 export const step = (state) => {
   return state.user.step;
 };
+
+export const community = (state) => {
+  return state.user.community;
+}

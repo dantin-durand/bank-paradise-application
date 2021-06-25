@@ -13,78 +13,36 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <!-- LOGIN -->
-      <ion-card class="ion-padding" v-if="currentform === 'login'">
-        <h2>Connexion</h2>
-        <ion-item class="ion-no-padding">
-          <ion-label position="floating">Adresse mail*</ion-label>
-          <ion-input v-model="form.email"></ion-input>
-        </ion-item>
-        <ion-item class="ion-no-padding">
-          <ion-label position="floating">Mot de passe*</ion-label>
-          <ion-input type="password" v-model="form.password"></ion-input>
-        </ion-item>
-        <br />
-        <ion-button @click="login" class="ion-margin-top">Connexion</ion-button>
-      </ion-card>
-      <!-- REGISTER -->
-      <ion-card class="ion-padding" v-if="currentform === 'register'">
-        <h2>Inscription</h2>
-        <ion-item class="ion-no-padding">
-          <ion-label position="floating">Adresse mail</ion-label>
-          <ion-input v-model="form.email"></ion-input>
-        </ion-item>
-        <ion-item class="ion-no-padding">
-          <ion-label position="floating">Prénom RP</ion-label>
-          <ion-input v-model="form.firstname"></ion-input>
-        </ion-item>
-        <ion-item class="ion-no-padding">
-          <ion-label position="floating">Nom RP</ion-label>
-          <ion-input v-model="form.lastname"></ion-input>
-        </ion-item>
-        <ion-item class="ion-no-padding">
-          <ion-label position="floating">Mot de passe</ion-label>
-          <ion-input type="password" v-model="form.password"></ion-input>
-        </ion-item>
-        <ion-item class="ion-no-padding">
-          <ion-label position="floating">Confirmez le mot de passe</ion-label>
-          <ion-input type="password" v-model="form.password2"></ion-input>
-        </ion-item>
-        <br />
-        <ion-button @click="register" class="ion-margin-top"
-          >Inscription</ion-button
-        >
-      </ion-card>
+      <Login :currentform="currentform" v-if="currentform === 'login'" />
+      <Register :currentform="currentform" v-else />
     </ion-content>
   </ion-page>
 </template>
 
 <script>
+import useVuelidate from "@vuelidate/core";
+import { required, email, minLength, sameAs } from "@vuelidate/validators";
 import {
   IonPage,
   IonContent,
-  IonCard,
   IonLabel,
-  IonInput,
-  IonItem,
-  IonButton,
   IonSegmentButton,
   IonSegment,
   IonToolbar,
   IonHeader,
 } from "@ionic/vue";
+import Login from "./Login/Login.vue";
+import Register from "./Register/Register.vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "News",
   components: {
+    Login,
+    Register,
     IonContent,
     IonPage,
-    IonCard,
     IonLabel,
-    IonInput,
-    IonItem,
-    IonButton,
     IonSegmentButton,
     IonSegment,
     IonToolbar,
@@ -102,6 +60,20 @@ export default defineComponent({
       currentform: "login",
     };
   },
+  setup() {
+    return { v$: useVuelidate() };
+  },
+  validations() {
+    return {
+      form: {
+        email: { required, email },
+        firstname: { required },
+        lastname: { required },
+        password: { required, minLength: minLength(12) },
+        confirmPassword: { required, sameAsPassword: sameAs("password") },
+      },
+    };
+  },
   created() {
     if (!this.$store.getters["auth/token"]) {
       console.log("echec d'authentification");
@@ -110,32 +82,10 @@ export default defineComponent({
       this.$router.push({ path: "/account" });
     }
   },
+
   methods: {
     segmentChanged(event) {
       this.currentform = event.detail.value;
-    },
-    async login() {
-      await this.$store.dispatch("auth/login", this.form).then(() => {
-        if (!this.$store.getters["auth/token"]) {
-          console.log("echec d'authentification");
-        } else if (this.$store.getters["auth/step"] > 0) {
-          this.$router.push({
-            name: `RegisterStep${this.$store.getters["auth/step"]}`,
-          });
-        } else {
-          this.$router.push({ name: "account" });
-        }
-      });
-    },
-    async register() {
-      if (this.form.password !== this.form.password2) return;
-      await this.$store.dispatch("auth/register", this.form).then(() => {
-        if (!this.$store.getters["auth/token"]) {
-          console.log("echec d'authentification");
-        } else {
-          this.$router.push({ name: "account" });
-        }
-      });
     },
   },
 });

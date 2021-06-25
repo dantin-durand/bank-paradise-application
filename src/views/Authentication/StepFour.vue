@@ -13,14 +13,30 @@
       <ion-card class="ion-padding">
         <ion-item class="ion-no-padding">
           <ion-label position="floating">Nom de la communauté</ion-label>
-          <ion-input></ion-input>
+          <ion-input v-model="form.name"></ion-input>
+          <div
+            class="input-errors"
+            v-for="error of v$.form.name.$errors"
+            :key="error.$uid"
+          >
+            <div class="error-msg">{{ error.$message }}</div>
+          </div>
         </ion-item>
         <ion-item class="ion-no-padding">
           <ion-label position="floating">Description</ion-label>
-          <ion-input></ion-input>
+          <ion-input v-model="form.description"></ion-input>
+          <div
+            class="input-errors"
+            v-for="error of v$.form.description.$errors"
+            :key="error.$uid"
+          >
+            <div class="error-msg">{{ error.$message }}</div>
+          </div>
         </ion-item>
         <div class="t-center">
-          <ion-button @click="create" class="ion-margin-top">Créer</ion-button>
+          <ion-button @click="createCommunity" class="ion-margin-top"
+            >Créer</ion-button
+          >
         </div>
       </ion-card>
     </ion-content>
@@ -28,6 +44,8 @@
 </template>
 
 <script>
+import useVuelidate from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
 import {
   IonPage,
   IonContent,
@@ -50,9 +68,31 @@ export default defineComponent({
     IonItem,
     IonButton,
   },
+  data() {
+    return {
+      form: {
+        name: "",
+        description: "",
+      },
+    };
+  },
+  setup() {
+    return { v$: useVuelidate() };
+  },
+  validations() {
+    return {
+      form: {
+        name: { required },
+        description: { required },
+      },
+    };
+  },
   methods: {
-    create() {
-      this.$router.push({ path: "/account" });
+    async createCommunity() {
+      if (this.form.password !== this.form.password2) return;
+      await this.$store.dispatch("auth/community", this.form).then(() => {
+        this.$router.push({ path: "/account" });
+      });
     },
   },
 });
