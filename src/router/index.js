@@ -32,7 +32,8 @@ const routes = [
         component: () => import("@/views/News.vue"),
       },
       {
-        path: "articles/1",
+        name: "article",
+        path: "articles/:id",
         component: () => import("@/views/Article.vue"),
       },
       {
@@ -59,6 +60,11 @@ const routes = [
         path: "account",
         name: "account",
         component: () => import("@/views/Account.vue"),
+      },
+      {
+        path: "settings",
+        name: "Settings",
+        component: () => import("@/views/Settings.vue"),
       },
     ],
   },

@@ -5,10 +5,16 @@
       <ion-label position="floating">Adresse mail*</ion-label>
       <ion-input v-model="form.email"></ion-input>
     </ion-item>
+    <div v-for="error of v$.form.email.$silentErrors" :key="error.$uid">
+      <p class="error-message">{{ error.$message }}</p>
+    </div>
     <ion-item class="ion-no-padding">
       <ion-label position="floating">Mot de passe*</ion-label>
       <ion-input type="password" v-model="form.password"></ion-input>
     </ion-item>
+    <div v-for="error of v$.form.password.$silentErrors" :key="error.$uid">
+      <p class="error-message">{{ error.$message }}</p>
+    </div>
     <br />
     <ion-button @click="login" class="ion-margin-top">Connexion</ion-button>
   </ion-card>
@@ -20,6 +26,7 @@
 import useVuelidate from "@vuelidate/core";
 import { required, email, minLength } from "@vuelidate/validators";
 import { IonCard, IonLabel, IonInput, IonItem, IonButton } from "@ionic/vue";
+import { toastError } from "@/utils/toast";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -52,6 +59,10 @@ export default defineComponent({
   },
   methods: {
     async login() {
+      if (this.v$.$invalid) {
+        toastError("Vous devez remplir tout les champs.");
+        return;
+      }
       await this.$store.dispatch("auth/login", this.form).then(() => {
         if (!this.$store.getters["auth/token"]) {
           console.log("echec d'authentification");

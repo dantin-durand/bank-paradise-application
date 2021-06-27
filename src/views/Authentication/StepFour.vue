@@ -14,25 +14,20 @@
         <ion-item class="ion-no-padding">
           <ion-label position="floating">Nom de la communauté</ion-label>
           <ion-input v-model="form.name"></ion-input>
-          <div
-            class="input-errors"
-            v-for="error of v$.form.name.$errors"
-            :key="error.$uid"
-          >
-            <div class="error-msg">{{ error.$message }}</div>
-          </div>
         </ion-item>
+        <div v-for="error of v$.form.name.$silentErrors" :key="error.$uid">
+          <p class="error-message">{{ error.$message }}</p>
+        </div>
         <ion-item class="ion-no-padding">
           <ion-label position="floating">Description</ion-label>
           <ion-input v-model="form.description"></ion-input>
-          <div
-            class="input-errors"
-            v-for="error of v$.form.description.$errors"
-            :key="error.$uid"
-          >
-            <div class="error-msg">{{ error.$message }}</div>
-          </div>
         </ion-item>
+        <div
+          v-for="error of v$.form.description.$silentErrors"
+          :key="error.$uid"
+        >
+          <p class="error-message">{{ error.$message }}</p>
+        </div>
         <div class="t-center">
           <ion-button @click="createCommunity" class="ion-margin-top"
             >Créer</ion-button
@@ -46,6 +41,7 @@
 <script>
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
+import { toastError } from "@/utils/toast";
 import {
   IonPage,
   IonContent,
@@ -89,7 +85,10 @@ export default defineComponent({
   },
   methods: {
     async createCommunity() {
-      if (this.form.password !== this.form.password2) return;
+      if (this.v$.$invalid) {
+        toastError("Vous devez remplir tout les champs.");
+        return;
+      }
       await this.$store.dispatch("auth/community", this.form).then(() => {
         this.$router.push({ path: "/account" });
       });

@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-header translucent>
+    <ion-header>
       <ion-toolbar>
         <ion-segment :value="currentform" @ionChange="segmentChanged">
           <ion-segment-button value="login">
@@ -100,9 +100,9 @@ export default defineComponent({
     opacity: 1;
   }
 }
-ion-card {
+/* ion-card {
   animation: fadeIn 0.5s forwards ease;
-}
+} */
 .newslist {
   display: grid;
   grid-template-columns: 1fr 1fr;

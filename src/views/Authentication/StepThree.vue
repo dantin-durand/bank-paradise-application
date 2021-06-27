@@ -22,26 +22,15 @@
           :stripe="stripe"
           :secret="secret"
           :token="token"
+          :plan="plan.id"
         />
-
-        <div class="t-center">
-          <ion-button @click="payement" class="ion-margin-top"
-            >Payer</ion-button
-          >
-        </div>
       </ion-card>
     </ion-content>
   </ion-page>
 </template>
 
 <script>
-import {
-  IonPage,
-  IonContent,
-  IonCard,
-  IonButton,
-  IonSkeletonText,
-} from "@ionic/vue";
+import { IonPage, IonContent, IonCard, IonSkeletonText } from "@ionic/vue";
 import { defineComponent } from "vue";
 import axios from "axios";
 import StripeCheckout from "../../components/StripeCheckout.vue";
@@ -52,7 +41,7 @@ export default defineComponent({
     IonContent,
     IonPage,
     IonCard,
-    IonButton,
+
     IonSkeletonText,
     StripeCheckout,
   },
@@ -76,10 +65,13 @@ export default defineComponent({
 
     this.$store.dispatch("payment/plans").then(() => {
       const plans = this.$store.getters["payment/plans"];
+      console.log("plans =>", plans);
+      console.log("formule =>", this.$route.query.formule);
       let plansFilter = [];
       plansFilter = plans.filter(
-        (plan) => plan.id == this.$route.query.formule
+        (plan) => plan.id === Number(this.$route.query.formule)
       );
+      console.log("PLANS_FILTER =>", plansFilter);
       if (plansFilter.length === 0) {
         this.$router.push({ name: "RegisterStep2" });
       } else {
@@ -88,10 +80,34 @@ export default defineComponent({
       }
     });
   },
+
   mounted() {
     this.stripe = window.Stripe(process.env.VUE_APP_STRIPE_PUBLIC_KEY);
     const elements = this.stripe.elements();
-    this.card = elements.create("card");
+    this.card = elements.create("card", {
+      iconStyle: "solid",
+      style: {
+        base: {
+          iconColor: "#d61016",
+          color: "#000",
+          fontWeight: 500,
+          fontFamily: "Roboto, Open Sans, Segoe UI, sans-serif",
+          fontSize: "16px",
+          fontSmoothing: "antialiased",
+
+          ":-webkit-autofill": {
+            color: "#d61016",
+          },
+          "::placeholder": {
+            color: "#000",
+          },
+        },
+        invalid: {
+          iconColor: "#eb1c26",
+          color: "#eb1c26",
+        },
+      },
+    });
     this.card.mount("#card-element");
     this.token = this.$store.getters["auth/token"];
     axios

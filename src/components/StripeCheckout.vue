@@ -1,27 +1,34 @@
 <template>
   <form method="post" @submit.prevent="submit">
-    <ion-item>
-      <ion-label>Nom</ion-label>
+    <ion-item class="ion-no-padding">
+      <ion-label position="floating">Nom</ion-label>
       <ion-input v-model="name"></ion-input>
     </ion-item>
     <div id="card-element"></div>
 
-    <ion-item>
-      <ion-label>Code promo</ion-label>
+    <ion-item class="ion-no-padding">
+      <ion-label position="floating">Code promo</ion-label>
       <ion-input v-model="coupon"></ion-input>
     </ion-item>
 
     <input type="hidden" v-model="payment_method" />
-
-    <div class="ion-padding-top">
-      <ion-button type="submit">Payer</ion-button>
+    <br />
+    <div class="t-center">
+      <ion-button type="submit" class="ion-margin-top">Payer</ion-button>
     </div>
   </form>
 </template>
 
 <script>
 import axios from "axios";
-import { IonItem, IonInput, IonLabel, IonButton } from "@ionic/vue";
+import {
+  IonItem,
+  IonInput,
+  IonLabel,
+  IonButton,
+  loadingController,
+} from "@ionic/vue";
+import { toastError, toastSuccess } from "@/utils/toast";
 
 export default {
   name: "StripeCheckout",
@@ -33,24 +40,38 @@ export default {
   },
   data() {
     return {
-      plan: "1",
       name: "",
       coupon: "",
       payment_method: "",
       payment_processing: false,
     };
   },
-  props: ["card", "stripe", "secret", "token"],
+
+  props: ["card", "stripe", "secret", "token", "plan"],
   methods: {
+    async loadingPayment() {
+      const loading = await loadingController.create({
+        message: "Paiement en cours...",
+      });
+
+      await loading.present();
+    },
     resetForm() {
-      this.plan = 1;
       this.name = "";
       this.coupon = "";
       this.payment_method = "";
       this.payment_processing = false;
     },
     async submit() {
+      if (!this.name.length) {
+        toastError("Vous devez saisir votre nom.");
+        return;
+      }
+      const loading = await loadingController.create({
+        message: "Paiement en cours...",
+      });
       this.payment_processing = true;
+
       const { setupIntent, error } = await this.stripe.confirmCardSetup(
         this.secret,
         {
@@ -61,16 +82,10 @@ export default {
         }
       );
       if (error) {
-        console.log("error => ", error);
-        // const toast = await toastController.create({
-        //   message: error.message,
-        //   duration: 2000,
-        //   color: "danger",
-        // });
-        // return toast.present();
+        toastError(error.message);
       } else {
-        console.log(setupIntent);
         this.payment_method = setupIntent.payment_method;
+        loading.present();
         await axios
           .post(
             `${process.env.VUE_APP_API_URL}/checkout/subscribe`,
@@ -87,7 +102,6 @@ export default {
             }
           )
           .then((response) => {
-            console.log(response.data);
             if (
               response.data.status &&
               response.data.status == "requires_action"
@@ -97,11 +111,15 @@ export default {
               this.$emit("requiresAction", true);
               this.$emit("paymentIntent", response.data);
             } else {
+              // je veux dismiss ici
+              loading.dismiss();
               this.$router.push({ name: "RegisterStep4" });
+              toastSuccess("Abonnement réalisé avec succès");
             }
           })
           .catch((error) => {
-            console.log(error);
+            toastError(error.response.data);
+            loading.dismiss();
           });
       }
     },
@@ -109,5 +127,11 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+#card-element {
+  padding: 40px 0px 10px;
+}
+form {
+  padding: 20px 0px;
+}
 </style>

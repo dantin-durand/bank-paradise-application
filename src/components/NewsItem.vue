@@ -1,11 +1,8 @@
 <template>
-  <ion-card
-    @click="openNews"
-    style="background: url('https://via.placeholder.com/200x250')"
-  >
+  <ion-card @click="openNews" :style="`background: url(${article.banner})`">
     <div>
-      <p>20/04/2021</p>
-      <h2>Mise en place d'un chat</h2>
+      <p>{{ getDate(article.created_at) }}</p>
+      <h2>{{ article.title }}</h2>
     </div>
   </ion-card>
 </template>
@@ -16,9 +13,29 @@ import { IonCard } from "@ionic/vue";
 export default {
   name: "NewsItem",
   components: { IonCard },
+  props: {
+    article: {
+      id: 0,
+      banner: "",
+      created_at: "",
+      title: "",
+    },
+  },
   methods: {
+    getDate(date) {
+      function AddZero(val) {
+        // adding 0 if the value is a single digit
+        return `0${val}`.slice(-2);
+      }
+
+      const formatedDate = new Date(date);
+      const year = formatedDate.getFullYear();
+      const month = AddZero(formatedDate.getMonth());
+      const day = formatedDate.getDate();
+      return `${day}/${month}/${year}`;
+    },
     openNews() {
-      this.$router.push({ path: "/articles/1" });
+      this.$router.push({ name: "article", params: { id: this.article.id } });
     },
   },
 };

@@ -17,19 +17,36 @@
             <ion-label position="floating">Nom*</ion-label>
             <ion-input v-model="form.lastname"></ion-input>
           </ion-item>
+          <div
+            v-for="error of v$.form.lastname.$silentErrors"
+            :key="error.$uid"
+          >
+            <p class="error-message">{{ error.$message }}</p>
+          </div>
           <ion-item>
             <ion-label position="floating">Prénom*</ion-label>
             <ion-input v-model="form.firstname"></ion-input>
           </ion-item>
+          <div
+            v-for="error of v$.form.firstname.$silentErrors"
+            :key="error.$uid"
+          >
+            <p class="error-message">{{ error.$message }}</p>
+          </div>
           <ion-item>
             <ion-label position="floating">Adresse Mail*</ion-label>
             <ion-input v-model="form.email"></ion-input>
           </ion-item>
+          <div v-for="error of v$.form.email.$silentErrors" :key="error.$uid">
+            <p class="error-message">{{ error.$message }}</p>
+          </div>
           <ion-item>
             <ion-label position="floating">Objet</ion-label>
             <ion-input v-model="form.object"></ion-input>
           </ion-item>
-          <br />
+          <div v-for="error of v$.form.object.$silentErrors" :key="error.$uid">
+            <p class="error-message">{{ error.$message }}</p>
+          </div>
           <ion-item>
             <ion-label position="floating">Message</ion-label>
             <ion-textarea
@@ -38,6 +55,9 @@
               rows="6"
             ></ion-textarea>
           </ion-item>
+          <div v-for="error of v$.form.body.$silentErrors" :key="error.$uid">
+            <p class="error-message">{{ error.$message }}</p>
+          </div>
 
           <ion-button
             @click.prevent="sendCustomerCareMail"
@@ -49,15 +69,15 @@
           <ul>
             <li>
               <ion-icon :icon="map"></ion-icon>
-              <p>19 rue Yves Toudic 75010 Paris</p>
+              <p>{{ contactInfo.address }}</p>
             </li>
             <li>
               <ion-icon :icon="call"></ion-icon>
-              <p>01 45 69 86 30</p>
+              <p>{{ contactInfo.phone }}</p>
             </li>
             <li>
               <ion-icon :icon="mail"></ion-icon>
-              <p>support@bank-paradise.com</p>
+              <p>{{ contactInfo.email }}</p>
             </li>
           </ul>
 
@@ -76,6 +96,8 @@
 <script>
 import useVuelidate from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
+import { mapGetters } from "vuex";
+import { toastError } from "@/utils/toast";
 import {
   IonPage,
   IonContent,
@@ -125,6 +147,9 @@ export default {
       },
     };
   },
+  computed: {
+    ...mapGetters({ contactInfo: "services/contactInfo" }),
+  },
   validations() {
     return {
       form: {
@@ -136,11 +161,27 @@ export default {
       },
     };
   },
+  mounted() {
+    this.getContactInfo();
+  },
   methods: {
-    async sendCustomerCareMail() {
-      await this.$store
-        .dispatch("auth/customerCare", this.form)
-        .then((response) => console.log(response));
+    getContactInfo() {
+      this.$store.dispatch("services/customerCareInfo");
+    },
+    sendCustomerCareMail() {
+      if (this.v$.$invalid) {
+        toastError("Vous devez remplir tout les champs.");
+        return;
+      }
+      this.$store.dispatch("services/customerCare", this.form);
+      this.resetFields();
+    },
+    resetFields() {
+      this.form.object = "";
+      this.form.firstname = "";
+      this.form.lastname = "";
+      this.form.email = "";
+      this.form.body = "";
     },
   },
 };

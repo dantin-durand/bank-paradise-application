@@ -1,4 +1,9 @@
 export default {
-    articles: [],
-  };
-  
+  articles: [],
+  selectedArticle: {
+    created_at: "",
+    title: "",
+    body: "",
+    banner: "",
+  },
+};

@@ -7,14 +7,20 @@
     </ion-header>
     <ion-content :fullscreen="true">
       <h1>News</h1>
-      <div class="newslist container">
-        <NewsItem />
-        <NewsItem />
-        <NewsItem />
-        <NewsItem />
-        <NewsItem />
-        <NewsItem />
-        <NewsItem />
+      <div class="newslist container" v-if="articles.length">
+        <NewsItem
+          v-for="article in articles"
+          :key="article.id"
+          :article="article"
+        />
+      </div>
+      <div class="newslist container" v-else>
+        <ion-skeleton-text
+          v-for="index in 10"
+          :key="index"
+          animated
+          style="height: 200px"
+        ></ion-skeleton-text>
       </div>
     </ion-content>
   </ion-page>
@@ -27,16 +33,13 @@ import {
   IonHeader,
   IonToolbar,
   IonTitle,
+  IonSkeletonText,
 } from "@ionic/vue";
 import NewsItem from "@/components/NewsItem.vue";
 import { defineComponent } from "vue";
+import { mapGetters } from "vuex";
 export default defineComponent({
   name: "News",
-  data() {
-    return {
-      articles: [],
-    };
-  },
   components: {
     NewsItem,
     IonContent,
@@ -44,12 +47,17 @@ export default defineComponent({
     IonHeader,
     IonToolbar,
     IonTitle,
+    IonSkeletonText,
+  },
+  mounted() {
+    this.getArticles();
+  },
+  computed: {
+    ...mapGetters({ articles: "articles/articles" }),
   },
   methods: {
     async getArticles() {
-      await this.$store.dispatch("articles/getArticlesList").then((result) => {
-        this.articles = result;
-      });
+      await this.$store.dispatch("articles/articles");
     },
   },
 });

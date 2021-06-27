@@ -22,6 +22,7 @@ export default defineComponent({
           this.$router.push({ name: "authentication" });
         } else {
           this.$store.dispatch("auth/account");
+          this.$store.dispatch("auth/getSubscription");
         }
       }
     },
@@ -60,5 +61,9 @@ p {
 ion-button {
   --background: var(--main-color);
   --background-activated: #9b0e13;
+}
+.error-message {
+  color: #d32727;
+  font-size: 14px;
 }
 </style>

@@ -14,6 +14,10 @@ export const community = (state, community) => {
   state.user.community = community;
 };
 
+export const subscription = (state, subscription) => {
+  state.user.subscription = subscription;
+};
+
 export const user = (state, user) => {
   state.user.firstname = user.firstname;
   state.user.lastname = user.lastname;

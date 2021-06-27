@@ -16,4 +16,8 @@ export const step = (state) => {
 
 export const community = (state) => {
   return state.user.community;
-}
+};
+
+export const subscription = (state) => {
+  return state.user.subscription;
+};

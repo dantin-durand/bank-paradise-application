@@ -20,20 +20,25 @@
         <p>Prénom RP: {{ user.firstname }}</p>
         <p>Mot de passe: {{ user.password }}</p>
         <p>Confirmer nouveau mot de passe: {{ user.confirmPassword }}</p>
-        <ion-button @click="editUserinfo" class="ion-margin-top"
+        <ion-button @click="goToUserEdition" class="ion-margin-top"
           >Modifier</ion-button
         >
       </ion-card>
-      <ion-card v-if="userHasSubscribed" class="ion-padding">
+      <ion-card v-if="subscription.stripe_url" class="ion-padding">
         <h3>Abonnemment</h3>
-        <p>Formule actuelle: Communauté (3.99€)</p>
-        <p>Prochain paiement: 02/11/2021</p>
-        <ion-button class="ion-margin-top">Changer de formule</ion-button>
-        <ion-button class="ion-margin-top secondary-btn" size="small"
-          >Annuler l'abonnement</ion-button
-        >
-        <ion-button class="ion-margin-top secondary-btn" size="small"
-          >Mettre en pause</ion-button
+        <p>
+          Formule actuelle: {{ subscription.plan.name }} ({{
+            subscription.plan.price
+          }})
+        </p>
+        <p>Depuis le: {{ subscription.plan.created_at }}</p>
+        <p v-if="subscription.plan.ends_at">
+          Prend fin le: {{ subscription.plan.ends_at }}
+        </p>
+        <ion-button
+          class="ion-margin-top"
+          @click.prevent="openStripe(subscription.stripe_url)"
+          >Changer de formule</ion-button
         >
       </ion-card>
       <ion-card v-else class="ion-padding">
@@ -100,8 +105,8 @@
 </template>
 
 <script>
-import useVuelidate from "@vuelidate/core";
-import { required, email, minLength, sameAs } from "@vuelidate/validators";
+// import useVuelidate from "@vuelidate/core";
+// import { required, email, minLength, sameAs } from "@vuelidate/validators";
 import {
   IonPage,
   IonContent,
@@ -128,11 +133,11 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapGetters({ user: "auth/data" }),
+    ...mapGetters({ user: "auth/data", subscription: "auth/subscription" }),
   },
   mounted() {
     if (this.user.stripe_id) {
-      this.userHasSubscribe = true;
+      this.userHasSubscribed = true;
     }
   },
   created() {
@@ -140,35 +145,19 @@ export default defineComponent({
       this.$router.push({ name: "authentication" });
     } else {
       this.$store.dispatch("auth/account");
+      this.$store.dispatch("auth/getSubscription");
     }
-  },
-  setup() {
-    return { v$: useVuelidate() };
-  },
-
-  validations() {
-    return {
-      form: {
-        email: { required, email },
-        firstname: { required },
-        lastname: { required },
-        password: { required, minLength: minLength(12) },
-        confirmPassword: { required, sameAsPassword: sameAs("password") },
-      },
-    };
   },
   methods: {
     ...mapActions({ logout: "auth/logout" }),
-
+    openStripe(stripe_url) {
+      window.location = stripe_url;
+    },
     goToSubscription() {
       this.$router.push({ name: "RegisterStep2" });
     },
-    async editUserInfo() {
-      await this.$store
-        .dispatch("auth/editUserInfo", this.form)
-        .then((result) => {
-          this.user = result.data.user;
-        });
+    goToUserEdition() {
+      this.$router.push({ name: "Settings" });
     },
   },
 });

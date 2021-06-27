@@ -13,12 +13,10 @@ export const login = async ({ commit }, form) => {
     .then((response) => {
       commit("token", response.data.token);
       commit("step", response.data.current_step);
-      console.log(response.data);
-      // this.$router.push({ path: "/account" });
     })
     .catch((error) => {
-      const statusCode = error.response.status;
-      console.log(statusCode);
+      // const statusCode = error.response.status;
+      console.log(error);
     });
 };
 
@@ -36,30 +34,9 @@ export const register = async ({ commit }, form) => {
     .then((response) => {
       commit("token", response.data.token);
       commit("step", response.data.current_step);
-      console.log(response.data);
     })
     .catch((error) => {
       console.log(error);
-    });
-};
-export const customerCare = async ({ commit }, form) => {
-  console.log(commit);
-  console.log(form);
-  let params = {
-    object: form.object,
-    email: form.email,
-    lastname: form.lastname,
-    firstname: form.firstname,
-    body: form.body,
-  };
-
-  await axios
-    .post(process.env.VUE_APP_API_URL + "/customerCare", params)
-    .then((response) => {
-      console.log(response);
-    })
-    .catch((error) => {
-      console.log(error.response);
     });
 };
 
@@ -137,7 +114,30 @@ export const logout = ({ commit, state }) => {
     .then(() => {
       commit("token", "");
       commit("data", {});
+      commit("subscription", {
+        stripe_url: "",
+        plan: {
+          name: "",
+          price: "",
+          created_at: "",
+          ends_at: null,
+        },
+      });
       router.push({ name: "authentication" });
+    })
+    .catch(() => {});
+};
+
+export const getSubscription = async ({ commit, state }) => {
+  if (!state.user.token) return;
+  const config = {
+    headers: { Authorization: `Bearer ${state.user.token}` },
+  };
+  await axios
+    .get(process.env.VUE_APP_API_URL + "/auth/getsubscription", config)
+    .then((response) => {
+      commit("subscription", response.data);
+      return response.data;
     })
     .catch(() => {});
 };
