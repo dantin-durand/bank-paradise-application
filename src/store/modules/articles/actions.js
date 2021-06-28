@@ -7,10 +7,7 @@ export const articles = async ({ commit }) => {
     .then((response) => {
       commit("articles", response.data.articlesList);
     })
-    .catch((error) => {
-      const statusCode = error.response.status;
-      console.log(statusCode);
-    });
+    .catch(() => {});
 };
 
 export const article = async ({ commit }, id) => {
@@ -19,9 +16,7 @@ export const article = async ({ commit }, id) => {
     .then((response) => {
       commit("article", response.data.article);
     })
-    .catch((error) => {
-      const statusCode = error.response.status;
-      console.log(statusCode);
+    .catch(() => {
       toastError("L'article n'existe pas");
     });
 };

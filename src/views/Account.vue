@@ -18,8 +18,6 @@
         <p>Adresse mail: {{ user.email }}</p>
         <p>Nom RP: {{ user.lastname }}</p>
         <p>Prénom RP: {{ user.firstname }}</p>
-        <p>Mot de passe: {{ user.password }}</p>
-        <p>Confirmer nouveau mot de passe: {{ user.confirmPassword }}</p>
         <ion-button @click="goToUserEdition" class="ion-margin-top"
           >Modifier</ion-button
         >

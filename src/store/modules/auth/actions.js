@@ -1,5 +1,6 @@
 import axios from "axios";
 import router from "../../../router";
+import { toastSuccess, toastError } from "@/utils/toast";
 
 export const login = async ({ commit }, form) => {
   let params = {
@@ -13,10 +14,10 @@ export const login = async ({ commit }, form) => {
     .then((response) => {
       commit("token", response.data.token);
       commit("step", response.data.current_step);
+      toastSuccess("Connexion réussie ! ");
     })
-    .catch((error) => {
-      // const statusCode = error.response.status;
-      console.log(error);
+    .catch(() => {
+      toastError("Mauvais identifiants de connexion");
     });
 };
 
@@ -34,9 +35,10 @@ export const register = async ({ commit }, form) => {
     .then((response) => {
       commit("token", response.data.token);
       commit("step", response.data.current_step);
+      toastSuccess("Compte créé !");
     })
-    .catch((error) => {
-      console.log(error);
+    .catch(() => {
+      toastError("L'inscription à échouée !");
     });
 };
 
@@ -55,20 +57,22 @@ export const community = async ({ commit, state }, form) => {
     .post(process.env.VUE_APP_API_URL + "/community", params, config)
     .then((response) => {
       commit("community", response.data.community);
+      toastSuccess("Communauté créé !");
     })
-    .catch((error) => {
-      console.log(error);
+    .catch(() => {
+      toastError("Création de la communauté à échouée");
     });
 };
 
 export const editUserInfo = async ({ commit, state }, form) => {
+  console.log(commit);
   const config = {
     headers: {
       Authorization: `Bearer ${state.user.token}`,
     },
   };
 
-  let params = {
+  const params = {
     firstname: form.firstname,
     lastname: form.lastname,
     email: form.email,
@@ -77,16 +81,16 @@ export const editUserInfo = async ({ commit, state }, form) => {
 
   await axios
     .put(process.env.VUE_APP_API_URL + "/user", params, config)
-    .then((response) => {
-      commit("user", response.data.user);
+    .then(() => {
+      router.push({ name: "account" });
+      toastSuccess("Vos informations ont été mise à jour");
     })
-    .catch((error) => {
-      console.log(error);
+    .catch(() => {
+      toastError("Echec de la mise à jour");
     });
 };
 
 export const account = async ({ commit, state }) => {
-  console.log("bisbkbvdkbvkdbvjdbvkdfbfbk");
   const config = {
     headers: {
       Authorization: `Bearer ${state.user.token}`,
@@ -98,9 +102,7 @@ export const account = async ({ commit, state }) => {
     .then((response) => {
       commit("data", ...response.data);
     })
-    .catch((error) => {
-      console.log(error);
-    });
+    .catch(() => {});
 };
 
 export const logout = ({ commit, state }) => {
@@ -124,8 +126,11 @@ export const logout = ({ commit, state }) => {
         },
       });
       router.push({ name: "authentication" });
+      toastSuccess("Déconnecté !");
     })
-    .catch(() => {});
+    .catch(() => {
+      toastError("La déconnexion à échouée !");
+    });
 };
 
 export const getSubscription = async ({ commit, state }) => {

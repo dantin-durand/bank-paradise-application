@@ -75,12 +75,9 @@ export default defineComponent({
     };
   },
   created() {
-    if (!this.$store.getters["auth/token"]) {
-      console.log("echec d'authentification");
-    } else {
-      console.log("authentification avec succès");
+    if (this.$store.getters["auth/token"]) {
       this.$router.push({ path: "/account" });
-    }
+    } 
   },
 
   methods: {

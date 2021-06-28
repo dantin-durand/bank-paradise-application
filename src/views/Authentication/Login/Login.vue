@@ -53,7 +53,7 @@ export default defineComponent({
     return {
       form: {
         email: { required, email },
-        password: { required, minLength: minLength(12) },
+        password: { required, minLength: minLength(8) },
       },
     };
   },
@@ -64,9 +64,7 @@ export default defineComponent({
         return;
       }
       await this.$store.dispatch("auth/login", this.form).then(() => {
-        if (!this.$store.getters["auth/token"]) {
-          console.log("echec d'authentification");
-        } else if (this.$store.getters["auth/step"] > 0) {
+        if (this.$store.getters["auth/step"] > 0) {
           this.$router.push({
             name: `RegisterStep${this.$store.getters["auth/step"]}`,
           });

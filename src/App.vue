@@ -16,7 +16,6 @@ export default defineComponent({
   },
   watch: {
     $route(to, from) {
-      console.log(to);
       if (to.name === "account" || from.name === "account") {
         if (!this.$store.getters["auth/token"]) {
           this.$router.push({ name: "authentication" });

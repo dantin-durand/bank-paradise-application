@@ -8,13 +8,12 @@ export const plans = async ({ commit }) => {
     .then((response) => {
       commit("plans", response.data);
     })
-    .catch((error) => {
-      console.log(error);
-    });
+    .catch(() => {});
 };
 
 export const customerCare = async ({ commit }, form) => {
   console.log(commit);
+
   let params = {
     object: form.object,
     email: form.email,

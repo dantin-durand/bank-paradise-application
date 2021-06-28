@@ -65,18 +65,14 @@ export default defineComponent({
 
     this.$store.dispatch("payment/plans").then(() => {
       const plans = this.$store.getters["payment/plans"];
-      console.log("plans =>", plans);
-      console.log("formule =>", this.$route.query.formule);
       let plansFilter = [];
       plansFilter = plans.filter(
         (plan) => plan.id === Number(this.$route.query.formule)
       );
-      console.log("PLANS_FILTER =>", plansFilter);
       if (plansFilter.length === 0) {
         this.$router.push({ name: "RegisterStep2" });
       } else {
         this.plan = plansFilter[0];
-        console.log(this.plan.id);
       }
     });
   },
@@ -117,11 +113,9 @@ export default defineComponent({
         },
       })
       .then((response) => {
-        console.log(response.data);
         this.secret = response.data.client_secret;
       })
-      .catch((error) => {
-        console.log(error);
+      .catch(() => {
       });
   },
   methods: {

@@ -73,7 +73,7 @@ import {
   IonPage,
 } from "@ionic/vue";
 import { defineComponent } from "vue";
-import { toastSuccess, toastError } from "@/utils/toast";
+import { toastError } from "@/utils/toast";
 
 export default defineComponent({
   name: "Settings",
@@ -91,20 +91,12 @@ export default defineComponent({
   },
 
   methods: {
-    async editUserInfo() {
+    editUserInfo() {
       if (this.v$.$invalid) {
         toastError("Vous devez remplir tout les champs.");
         return;
       }
-      await this.$store
-        .dispatch("auth/editUserInfo", this.form)
-        .then((result) => {
-          this.user = result.data.user;
-          toastSuccess("Vos informations ont été mise à jour");
-        })
-        .catch(() => {
-          toastError("Echec de la mise à jour");
-        });
+      this.$store.dispatch("auth/editUserInfo", this.form);
     },
     loadUserInfo() {
       this.form.email = this.userInfo.email;
@@ -112,6 +104,7 @@ export default defineComponent({
       this.form.lastname = this.userInfo.lastname;
     },
   },
+
   mounted() {
     this.loadUserInfo();
   },
@@ -120,6 +113,14 @@ export default defineComponent({
       this.$router.push({ name: "authentication" });
       return;
     }
+  },
+
+  watch: {
+    $route(to) {
+      if (to.name === "Settings") {
+        this.loadUserInfo();
+      }
+    },
   },
   computed: {
     ...mapGetters({ userInfo: "auth/data" }),
@@ -147,7 +148,7 @@ export default defineComponent({
         email: { required, email },
         firstname: { required },
         lastname: { required },
-        password: { required, minLength: minLength(12) },
+        password: { required, minLength: minLength(8) },
         confirmPassword: {
           required,
           sameAsPassword: sameAs(this.form.password),

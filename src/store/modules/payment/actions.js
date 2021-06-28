@@ -7,7 +7,6 @@ export const plans = async ({ commit }) => {
     .then((response) => {
       commit("plans", response.data);
     })
-    .catch((error) => {
-      console.log(error);
+    .catch(() => {
     });
 };
